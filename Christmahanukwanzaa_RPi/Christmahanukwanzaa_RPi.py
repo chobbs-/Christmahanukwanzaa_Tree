@@ -41,7 +41,14 @@ import time
 import board
 import neopixel
 import socket
+import pyb
 from collections import namedtuple
+
+# Start the timer
+start = pyb.millis()
+
+# Note on MDNS: This should be handled by Raspbian. You should be able to hit
+# <hostname>.local on your local network.
 
 # Choose an open pin connected to the Data In of the NeoPixel strip, i.e. board.D18
 # NeoPixels must be connected to D10, D12, D18 or D21 to work.
@@ -113,20 +120,59 @@ buffer = ''
 # Setup the web server
 addr = socket.getaddrinfo('localhost', 8080)
 
-s = socket.socket()
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind(addr)
 s.listen(1)
+s.setblocking(0)
 
 print('listening on ', addr)
 
+def gradient(scheme, width, speed = 1000):
+    #gradient
+    return
+
+def bars(scheme, width = 1, speed = 1000):
+    maxSize = num_pixels / scheme.count
+    if width > maxSize:
+        return
+    offset = pyb.elapsed_millis(start) / speed if speed > 0 else 0
+
+    for i in range(num_pixels):
+        colorIndex = ((i + offset) % (scheme.count * width)) / width
+        pixels[i] = (scheme.colors[colorIndex].red, scheme.colors[colorIndex].green, scheme.colors[colorIndex].blue)
+    pixels.show()
+    return
+
 # Main loop
 while True:
-    cl, addr = s.accept()
-    print('client connected from ', addr)
-    data = cl.recv(1024)
-    if "GET /arduino" in data.decode():
-        print('got it')
-    response = (b'HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n\r\n')
-    cl.sendall(response)
-    cl.close()
+    try:
+        cl, addr = s.accept()
+    except: 
+        pass
+    else:
+        print('client connected from ', addr)
+        data = cl.recv(1024).decode()
+        request = data.split('\n')[0]
+        if "GET /arduino" not in request:
+            cl.close()
+            continue
+        # Parse request uri
+        key = request.split(' ')[1].split('/')[2]
+        value = request.split(' ')[1].split('/')[3]
+        if key == 'scheme':
+            currentScheme = int(value)
+        elif key == 'pattern':
+            currentPattern = int(value)
+        elif key == 'width':
+            currentWidth = int(value)
+        elif key == 'speed':
+            currentSpeed = int(value)
+        response = (b'HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n\r\n')
+        cl.sendall(response)
+        cl.close()
     
+    # Update pixels based on current state
+    if Pattern[currentPattern] == 'BARS':
+        bars(schemes[currentScheme], barWidthValues[currentWidth], speedValues[currentSpeed])
+    elif Pattern[currentPattern] == 'GRADIENT':
+        gradient(schemes[currentScheme], gradientWidthValues[currentWidth], speedValues[currentSpeed])
