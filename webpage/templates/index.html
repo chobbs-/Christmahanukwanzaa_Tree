@@ -92,7 +92,7 @@
     <script>
         $(document).ready(function() {
             console.log('Communicating with Arduino at IP: {{ model.arduino_ip }}');
-            var arduinoURL = 'http://{{ model.arduino_ip }}/arduino/';
+            var arduinoURL = 'http://{{ model.arduino_ip }}:8080/arduino/';
 
             // Add click handlers which make GET requests to the tree server.
             // Note that jsonp callbacks MUST be used to deal with cross-domain browser

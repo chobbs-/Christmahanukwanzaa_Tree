@@ -14,7 +14,7 @@ from flask import *
 # - On Linux Bonjour support is likely installed already (if you use Ubuntu for example).
 #   If not, install Avahi: http://avahi.org/
 # - On Mac OSX Bonjour is installed automatically.
-ARDUINO_MDNS_NAME = 'arduino.local'
+ARDUINO_MDNS_NAME = 'pi-treelights.local'
 ARDUINO_IP = None
 
 # Flask app configuration

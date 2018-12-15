@@ -41,11 +41,10 @@ import time
 import board
 import neopixel
 import socket
-import pyb
 from collections import namedtuple
 
 # Start the timer
-start = pyb.millis()
+current_milli_time = lambda: int(round(time.time() * 1000))
 
 # Note on MDNS: This should be handled by Raspbian. You should be able to hit
 # <hostname>.local on your local network.
@@ -118,7 +117,8 @@ currentSpeed = 0
 buffer = ''
 
 # Setup the web server
-addr = socket.getaddrinfo('localhost', 8080)
+addr = socket.getaddrinfo('0.0.0.0', 8080, socket.AF_INET)[0][-1]
+print(addr)
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind(addr)
@@ -135,10 +135,10 @@ def bars(scheme, width = 1, speed = 1000):
     maxSize = num_pixels / scheme.count
     if width > maxSize:
         return
-    offset = pyb.elapsed_millis(start) / speed if speed > 0 else 0
+    offset = current_milli_time() // speed if speed > 0 else 0
 
     for i in range(num_pixels):
-        colorIndex = ((i + offset) % (scheme.count * width)) / width
+        colorIndex = int(((i + offset) % (scheme.count * width)) // width)
         pixels[i] = (scheme.colors[colorIndex].red, scheme.colors[colorIndex].green, scheme.colors[colorIndex].blue)
     pixels.show()
     return
@@ -158,7 +158,9 @@ while True:
             continue
         # Parse request uri
         key = request.split(' ')[1].split('/')[2]
-        value = request.split(' ')[1].split('/')[3]
+        print(key)
+        value = request.split(' ')[1].split('/')[3].split('?')[0]
+        print(value)
         if key == 'scheme':
             currentScheme = int(value)
         elif key == 'pattern':
@@ -176,3 +178,4 @@ while True:
         bars(schemes[currentScheme], barWidthValues[currentWidth], speedValues[currentSpeed])
     elif Pattern[currentPattern] == 'GRADIENT':
         gradient(schemes[currentScheme], gradientWidthValues[currentWidth], speedValues[currentSpeed])
+    #time.sleep(0.1)
