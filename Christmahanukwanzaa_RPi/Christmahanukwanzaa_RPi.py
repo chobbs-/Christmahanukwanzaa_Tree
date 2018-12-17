@@ -58,9 +58,9 @@ num_pixels = 300
 
 # The order of the pixel colors - RGB or GRB. Some NeoPixels have red and green reversed!
 # For RGBW NeoPixels, simply change the ORDER to RGBW or GRBW.
-ORDER = neopixel.GRB
+ORDER = neopixel.RGB
 
-pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=0.5, auto_write=False,
+pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=0.3, auto_write=False,
 pixel_order=ORDER)
 
 # Color scheme definitions.
@@ -88,7 +88,10 @@ incandescent = ColorScheme(incandescentColors, len(incandescentColors))
 fireColors = [ Color(255, 0, 0), Color(255, 102, 0), Color(255, 192, 0) ]
 fire = ColorScheme(fireColors, len(fireColors))
 
-schemes = [ incandescent, rgb, christmas, hanukkah, kwanzaa, rainbow, fire ]
+classicColors = [ Color(255, 0, 0), Color(255, 128, 0), Color(0, 255, 0), Color(127, 0, 255), Color(0, 0, 255), Color(255, 0, 255) ]
+classic = ColorScheme(classicColors, len(classicColors))
+
+schemes = [ incandescent, rgb, christmas, hanukkah, kwanzaa, rainbow, fire, classic ]
 
 # Enumeration of possible pattern types
 Pattern = ['BARS', 'GRADIENT']
@@ -117,7 +120,7 @@ currentSpeed = 0
 buffer = ''
 
 # Setup the web server
-addr = socket.getaddrinfo('0.0.0.0', 8080, socket.AF_INET)[0][-1]
+addr = socket.getaddrinfo('0.0.0.0', 80, socket.AF_INET)[0][-1]
 print(addr)
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

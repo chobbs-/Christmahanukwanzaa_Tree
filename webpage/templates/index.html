@@ -41,6 +41,9 @@
                     <div class="col-sm-2">
                         <button type="button" class="btn btn-default btn-block" id="fire">Fire</button>
                     </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-default btn-block" id="classic">Classic</button>
+                    </div>
                 </div>
             </div>
             <div class="row">
@@ -92,7 +95,7 @@
     <script>
         $(document).ready(function() {
             console.log('Communicating with Arduino at IP: {{ model.arduino_ip }}');
-            var arduinoURL = 'http://{{ model.arduino_ip }}:8080/arduino/';
+            var arduinoURL = 'http://{{ model.arduino_ip }}/arduino/';
 
             // Add click handlers which make GET requests to the tree server.
             // Note that jsonp callbacks MUST be used to deal with cross-domain browser
@@ -148,6 +151,14 @@
             $('#fire').click(function() {
                 $.ajax({
                     url: arduinoURL + 'scheme/6', 
+                    dataType: 'jsonp',
+                    jsonpCallback: 'dummy'
+                });
+            });
+
+            $('#classic').click(function() {
+                $.ajax({
+                    url: arduinoURL + 'scheme/7', 
                     dataType: 'jsonp',
                     jsonpCallback: 'dummy'
                 });
