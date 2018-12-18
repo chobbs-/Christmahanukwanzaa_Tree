@@ -113,13 +113,18 @@ speedValues = [ 0,       # None
                 250,     # Medium
                 50   ]  # Fast
 
+# Chance of glitter values
+glitter = [ 0,       # Off
+            75,      # Some
+            160,     # More
+            255  ]   # TONS
+
 # Variables to hold current state.
 currentScheme = 0
 currentPattern = 0
 currentWidth = 0
 currentSpeed = 0
-currentGlitter = 1
-glit = 160 # how much glitter do you want? set it here and doesn't change.
+currentGlitter = 0 
 
 # Setup the web server
 addr = socket.getaddrinfo('0.0.0.0', 80, socket.AF_INET)[0][-1]
@@ -154,9 +159,6 @@ def gradientColor(scheme, pixrange, gradRange, i):
     colorIndex = rangeIndex // gradRange
     start = colorIndex
     end = colorIndex + 1
-    print(colorIndex)
-    print(start)
-    print(end)
     if curRange % 2 != 0:
         start = (scheme.count - 1) - start
         end = (scheme.count -1) - end
@@ -204,7 +206,8 @@ def bars(scheme, width = 1, speed = 1000):
 
 def addGlitter(chanceofGlitter):
     if random.randint(0, 255) < chanceofGlitter:
-        pixels[random.randint(0, num_pixels)] = (255, 255, 255)
+        pixels[random.randint(0, (num_pixels-1))] = (255, 255, 255)
+        pixels.show()
     return
 
 # Main loop
@@ -246,5 +249,4 @@ while True:
         gradient(schemes[currentScheme], gradientWidthValues[currentWidth], speedValues[currentSpeed])
     
     # Check to see if we should add some glitter!
-    if currentGlitter:
-        addGlitter(glit)
+    addGlitter(glitter[currentGlitter])

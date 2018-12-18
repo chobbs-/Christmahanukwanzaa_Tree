@@ -88,6 +88,23 @@
                     </div>
                 </div>
             </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <h2>Glitter</h2>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-default btn-block" id="glitterOff">None</button>
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-default btn-block" id="glitterSome">Some</button>
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-default btn-block" id="glitterMore">More</button>
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-default btn-block" id="glitterTons">Tons</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </body>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
@@ -235,6 +252,39 @@
                     jsonpCallback: 'dummy'
                 });
             });
+
+            $('#glitterOff').click(function() {
+                $.ajax({
+                    url: arduinoURL + 'glitter/0', 
+                    dataType: 'jsonp',
+                    jsonpCallback: 'dummy'
+                });
+            });
+
+            $('#glitterSome').click(function() {
+                $.ajax({
+                    url: arduinoURL + 'glitter/1', 
+                    dataType: 'jsonp',
+                    jsonpCallback: 'dummy'
+                });
+            });
+
+            $('#glitterMore').click(function() {
+                $.ajax({
+                    url: arduinoURL + 'glitter/2', 
+                    dataType: 'jsonp',
+                    jsonpCallback: 'dummy'
+                });
+            });
+
+            $('#glitterTons').click(function() {
+                $.ajax({
+                    url: arduinoURL + 'glitter/3', 
+                    dataType: 'jsonp',
+                    jsonpCallback: 'dummy'
+                });
+            });
+
         });
     </script>
 </html>
