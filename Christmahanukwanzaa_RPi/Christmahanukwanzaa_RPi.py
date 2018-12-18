@@ -41,7 +41,6 @@ import time
 import board
 import neopixel
 import socket
-import simpleio
 from collections import namedtuple
 
 # Start the timer
@@ -131,20 +130,37 @@ s.setblocking(0)
 
 print('listening on ', addr)
 
+# Ripped from simpleio because I couldnt get it installed. This works.
+def map_range(x, in_min, in_max, out_min, out_max):
+    """
+    Maps a number from one range to another.
+    Note: This implementation handles values < in_min differently than arduino's map function does.
+
+    :return: Returns value mapped to new range
+    :rtype: float
+    """
+    mapped = (x-in_min) * (out_max - out_min) / (in_max-in_min) + out_min
+    if out_min <= out_max:
+        return max(min(mapped, out_max), out_min)
+    return min(max(mapped, out_max), out_min)
+
 # Compute the color of a pixel at position i using a gradient of the color scheme.  
 # This function is used internally by the gradient function.
 def gradientColor(scheme, pixrange, gradRange, i):
-    curRange = i / pixrange
+    curRange = i // pixrange
     rangeIndex = i % pixrange
-    colorIndex = rangeIndex / gradRange
+    colorIndex = rangeIndex // gradRange
     start = colorIndex
     end = colorIndex + 1
+    print(colorIndex)
+    print(start)
+    print(end)
     if curRange % 2 != 0:
         start = (scheme.count - 1) - start
         end = (scheme.count -1) - end
-    return Color(simpleio.map_range(rangeIndex % gradRange, 0, gradRange, scheme.colors[start].red, scheme.colors[end].red),
-                 simpleio.map_range(rangeIndex % gradRange, 0, gradRange, scheme.colors[start].green, scheme.colors[end].green),
-                 simpleio.map_range(rangeIndex % gradRange, 0, gradRange, scheme.colors[start].blue, scheme.colors[end].blue))
+    return Color(int(map_range(rangeIndex % gradRange, 0, gradRange, scheme.colors[start].red, scheme.colors[end].red)),
+                 int(map_range(rangeIndex % gradRange, 0, gradRange, scheme.colors[start].green, scheme.colors[end].green)),
+                 int(map_range(rangeIndex % gradRange, 0, gradRange, scheme.colors[start].blue, scheme.colors[end].blue)))
 
 # Display a gradient of colors for the provided color scheme.
 # Repeat is the number of repetitions of the gradient (pick a multiple of 2 for smooth looping of the gradient).
@@ -163,9 +179,9 @@ def gradient(scheme, repeat = 1, speed = 1000):
     for i in range(num_pixels):
         currentColor = gradientColor(scheme, pixrange, gradRange, i+offset)
         if speed > 0:
-            pixels[i] = (simpleio.map_range(current_time % speed, 0, speed, oldColor.red, currentColor.red),
-                         simpleio.map_range(current_time % speed, 0, speed, oldColor.green, currentColor.green),
-                         simpleio.map_range(current_time % speed, 0, speed, oldColor.blue, currentColor.blue))
+            pixels[i] = (int(map_range(current_time % speed, 0, speed, oldColor.red, currentColor.red)),
+                         int(map_range(current_time % speed, 0, speed, oldColor.green, currentColor.green)),
+                         int(map_range(current_time % speed, 0, speed, oldColor.blue, currentColor.blue)))
         else:
             pixels[i] = (currentColor.red, currentColor.green, currentColor.blue)
         oldColor = currentColor
