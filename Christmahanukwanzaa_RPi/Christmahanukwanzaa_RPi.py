@@ -41,6 +41,7 @@ import time
 import board
 import neopixel
 import socket
+import simpleio
 from collections import namedtuple
 
 # Start the timer
@@ -130,8 +131,45 @@ s.setblocking(0)
 
 print('listening on ', addr)
 
-def gradient(scheme, width, speed = 1000):
-    #gradient
+# Compute the color of a pixel at position i using a gradient of the color scheme.  
+# This function is used internally by the gradient function.
+def gradientColor(scheme, pixrange, gradRange, i):
+    curRange = i / pixrange
+    rangeIndex = i % pixrange
+    colorIndex = rangeIndex / gradRange
+    start = colorIndex
+    end = colorIndex + 1
+    if curRange % 2 != 0:
+        start = (scheme.count - 1) - start
+        end = (scheme.count -1) - end
+    return Color(simpleio.map_range(rangeIndex % gradRange, 0, gradRange, scheme.colors[start].red, scheme.colors[end].red),
+                 simpleio.map_range(rangeIndex % gradRange, 0, gradRange, scheme.colors[start].green, scheme.colors[end].green),
+                 simpleio.map_range(rangeIndex % gradRange, 0, gradRange, scheme.colors[start].blue, scheme.colors[end].blue))
+
+# Display a gradient of colors for the provided color scheme.
+# Repeat is the number of repetitions of the gradient (pick a multiple of 2 for smooth looping of the gradient).
+# SpeedMS is the number of milliseconds it takes for the gradient to move one pixel.  Set to zero for no animation.
+def gradient(scheme, repeat = 1, speed = 1000):
+    if scheme.count < 2:
+        return
+
+    pixrange = num_pixels // repeat + (num_pixels % repeat > 0)
+    gradRange = pixrange // (scheme.count - 1) + (pixrange % (scheme.count -1) > 0)
+
+    current_time = current_milli_time()
+    offset = current_time // speed if speed > 0 else 0
+
+    oldColor = gradientColor(scheme, pixrange, gradRange, (num_pixels-1)+offset)
+    for i in range(num_pixels):
+        currentColor = gradientColor(scheme, pixrange, gradRange, i+offset)
+        if speed > 0:
+            pixels[i] = (simpleio.map_range(current_time % speed, 0, speed, oldColor.red, currentColor.red),
+                         simpleio.map_range(current_time % speed, 0, speed, oldColor.green, currentColor.green),
+                         simpleio.map_range(current_time % speed, 0, speed, oldColor.blue, currentColor.blue))
+        else:
+            pixels[i] = (currentColor.red, currentColor.green, currentColor.blue)
+        oldColor = currentColor
+    pixels.show()
     return
 
 def bars(scheme, width = 1, speed = 1000):
