@@ -41,6 +41,7 @@ import time
 import board
 import neopixel
 import socket
+import random
 from collections import namedtuple
 
 # Start the timer
@@ -117,7 +118,8 @@ currentScheme = 0
 currentPattern = 0
 currentWidth = 0
 currentSpeed = 0
-buffer = ''
+currentGlitter = 1
+glit = 160 # how much glitter do you want? set it here and doesn't change.
 
 # Setup the web server
 addr = socket.getaddrinfo('0.0.0.0', 80, socket.AF_INET)[0][-1]
@@ -200,6 +202,11 @@ def bars(scheme, width = 1, speed = 1000):
     pixels.show()
     return
 
+def addGlitter(chanceofGlitter):
+    if random.randint(0, 255) < chanceofGlitter:
+        pixels[random.randint(0, num_pixels)] = (255, 255, 255)
+    return
+
 # Main loop
 while True:
     try:
@@ -226,6 +233,8 @@ while True:
             currentWidth = int(value)
         elif key == 'speed':
             currentSpeed = int(value)
+        elif key == 'glitter':
+            currentGlitter = int(value)
         response = (b'HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n\r\n')
         cl.sendall(response)
         cl.close()
@@ -235,4 +244,7 @@ while True:
         bars(schemes[currentScheme], barWidthValues[currentWidth], speedValues[currentSpeed])
     elif Pattern[currentPattern] == 'GRADIENT':
         gradient(schemes[currentScheme], gradientWidthValues[currentWidth], speedValues[currentSpeed])
-    #time.sleep(0.1)
+    
+    # Check to see if we should add some glitter!
+    if currentGlitter:
+        addGlitter(glit)
