@@ -61,7 +61,7 @@ num_pixels = 300
 # For RGBW NeoPixels, simply change the ORDER to RGBW or GRBW.
 ORDER = neopixel.RGB
 
-pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=0.3, auto_write=False,
+pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=1.0, auto_write=False,
 pixel_order=ORDER)
 
 # Color scheme definitions.
@@ -120,7 +120,7 @@ glitter = [ 0,       # Off
             255  ]   # TONS
 
 # Variables to hold current state.
-currentScheme = 0
+currentScheme = random.randint(0, 7)
 currentPattern = 0
 currentWidth = 0
 currentSpeed = 0
@@ -204,10 +204,11 @@ def bars(scheme, width = 1, speed = 1000):
     pixels.show()
     return
 
-def addGlitter(chanceofGlitter):
-    if random.randint(0, 255) < chanceofGlitter:
-        pixels[random.randint(0, (num_pixels-1))] = (255, 255, 255)
-        pixels.show()
+def addGlitter(chanceofGlitter, factor):
+    for i in range(factor):
+        if random.randint(0, 255) < chanceofGlitter:
+            pixels[random.randint(0, (num_pixels-1))] = (255, 255, 255)
+            pixels.show()
     return
 
 # Main loop
@@ -249,4 +250,4 @@ while True:
         gradient(schemes[currentScheme], gradientWidthValues[currentWidth], speedValues[currentSpeed])
     
     # Check to see if we should add some glitter!
-    addGlitter(glitter[currentGlitter])
+    addGlitter(glitter[currentGlitter], currentGlitter)
